@@ -64,10 +64,8 @@ body {
 .timetable {
     &__container {
         max-width: 1440px;
-        // max-width: 652px;
         margin: 0 auto;
-        padding: 0 20px;
-        padding-top: 80px;
+        padding: 20px;
         &-button {
             display: flex;
             justify-content: flex-end;
@@ -78,7 +76,7 @@ body {
         position: relative;
         background: var(--white-color);
         border-radius: 25px;
-        padding: 50px;
+        padding: 40px;
         padding-bottom: 41px;
     }
     &__flex {

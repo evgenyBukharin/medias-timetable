@@ -106,6 +106,13 @@ export default createStore({
         isTimetableLoaded: false,
         isDoctorsListLoaded: false,
         doneButtonText: 'Записать на прием',
+        userFormData: {
+            name: '',
+            surname: '',
+            fatherName: '',
+            phone: '',
+            birthday: null,
+        },
     },
     getters: {},
     mutations: {
