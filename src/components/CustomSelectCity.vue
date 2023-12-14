@@ -24,7 +24,12 @@
             }"
         >
             <ul class="list-reset custom-select__list">
-                <li class="custom-select__item" v-for="(value, idx) in valuesList" :key="value + idx" @click="updateCurrentCity(value)">
+                <li
+                    class="custom-select__item"
+                    v-for="(value, idx) in valuesList"
+                    :key="value + idx"
+                    @click="updateCurrentCity(value)"
+                >
                     {{ value }}
                 </li>
             </ul>
@@ -36,7 +41,7 @@
 import simplebar from 'simplebar-vue';
 import 'simplebar-vue/dist/simplebar.min.css';
 export default {
-    name: 'CustomSelect',
+    name: 'CustomSelectCity',
     components: { simplebar },
     props: {
         valuesList: {

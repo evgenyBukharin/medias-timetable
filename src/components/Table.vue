@@ -10,7 +10,8 @@
             <div
                 class="table__cell table__cell-day"
                 :class="{
-                    'table__cell-button': index == 0 || index == $store.state.visiblePeriod.length - 1,
+                    'table__cell-button':
+                        index == 0 || index == $store.state.visiblePeriod.length - 1,
                     'table__cell-button-reversed': index == $store.state.visiblePeriod.length - 1,
                     'table__cell-button-period-7': $store.state.currentPeriod == 7,
                 }"
@@ -18,7 +19,9 @@
                 @click="changePeriod($event)"
             >
                 <div class="table__container-cell">
-                    <span class="table__text table__text-date">{{ removeYearFromDate(item.date) }}</span>
+                    <span class="table__text table__text-date">{{
+                        removeYearFromDate(item.date)
+                    }}</span>
                     <span class="table__text table__text-weekday">{{ item.weekDay }}</span>
                 </div>
             </div>
@@ -32,7 +35,12 @@
                     'table__cell-day-selected': isBronned.isSelected,
                 }"
                 v-for="(isBronned, idx) in getTimetableRows(row.days, row.time)"
-                @click="selectCell($event.target, isBronned.status, { time: row.time, day: $store.state.visiblePeriod[idx].date })"
+                @click="
+                    selectCell($event.target, isBronned.status, {
+                        time: row.time,
+                        day: $store.state.visiblePeriod[idx].date,
+                    })
+                "
             ></div>
         </div>
         <div
@@ -47,7 +55,7 @@
                     'table__text-banner-hidden': $store.state.isTimetableLoaded == 'pending',
                 }"
             >
-                Выберите сотрудника или кабинет
+                Выберите сотрудника и кабинет
             </h4>
             <span
                 class="table__loader"
@@ -84,7 +92,10 @@ export default {
                 const currMoment = moment(this.starterDate);
                 result[i] = {
                     date: currMoment.add({ d: i }).format(this.format),
-                    weekDay: currMoment.day() < 7 ? this.daysArray[currMoment.day()] : this.daysArray[currMoment.day() - 7],
+                    weekDay:
+                        currMoment.day() < 7
+                            ? this.daysArray[currMoment.day()]
+                            : this.daysArray[currMoment.day() - 7],
                 };
             }
             this.$store.commit('setNewVisiblePeriod', result);
@@ -172,6 +183,7 @@ export default {
             opacity: 0;
             visibility: hidden;
         }
+        filter: grayscale(1);
     }
     &__container {
         &-cell {
@@ -246,7 +258,8 @@ export default {
                 left: 0;
                 width: 12px;
                 height: 100%;
-                background: var(--table-border-color) url('../assets/img/arrow.svg') no-repeat 1px center;
+                background: var(--table-border-color) url('../assets/img/arrow.svg') no-repeat 1px
+                    center;
             }
             &-reversed {
                 align-items: flex-start;

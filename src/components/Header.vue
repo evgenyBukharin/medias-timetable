@@ -3,23 +3,36 @@
         <UserForm />
         <div class="header__container">
             <div class="header__column">
-                <CustomSelect :valuesList="$store.state.citiesList" :currentValue="$store.state.currentCity" />
-                <!-- <FillialToggler /> -->
+                <ServiceField />
+                <CustomSelectCabinet
+                    :valuesList="$store.state.doctorsList"
+                    :currentValue="$store.state.currentDoctor"
+                    v-show="$store.state.isDoctorChanged"
+                />
             </div>
-            <PeriodToggler />
+            <PeriodToggler v-show="$store.state.isServiceChanged" />
         </div>
     </div>
 </template>
 
 <script>
-import CustomSelect from './CustomSelect.vue';
+import CustomSelectCity from './CustomSelectCity.vue';
+import CustomSelectCabinet from './CustomSelectCabinet.vue';
 import FillialToggler from './FillialToggler.vue';
 import PeriodToggler from './PeriodToggler.vue';
 import UserForm from './UserForm.vue';
+import ServiceField from './ServiceField.vue';
 
 export default {
     name: 'Header',
-    components: { CustomSelect, FillialToggler, PeriodToggler, UserForm },
+    components: {
+        CustomSelectCity,
+        CustomSelectCabinet,
+        FillialToggler,
+        PeriodToggler,
+        UserForm,
+        ServiceField,
+    },
 };
 </script>
 
@@ -27,13 +40,13 @@ export default {
 .header {
     &__column {
         display: flex;
+        align-items: center;
         flex-wrap: wrap;
         gap: 15px;
     }
     &__container {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 15px;
     }
 }
 </style>

@@ -1,20 +1,22 @@
 <template>
     <div class="timetable__container">
         <div class="timetable__content">
-            <Header></Header>
-            <div class="timetable__flex">
-                <TimetableColumn />
-                <Table />
+            <Header />
+            <div class="timetable" v-show="$store.state.isServiceChanged">
+                <div class="timetable__flex">
+                    <TimetableColumn />
+                    <Table />
+                </div>
+                <div class="timetable__container-button">
+                    <DoneButton />
+                </div>
+                <div
+                    class="timetable__mask"
+                    :class="{
+                        'timetable__mask-disabled': $store.state.isDoctorsListLoaded,
+                    }"
+                ></div>
             </div>
-            <div class="timetable__container-button">
-                <DoneButton />
-            </div>
-            <div
-                class="timetable__mask"
-                :class="{
-                    'timetable__mask-disabled': $store.state.isDoctorsListLoaded,
-                }"
-            ></div>
         </div>
     </div>
 </template>
@@ -29,7 +31,7 @@ export default {
     name: 'App',
     components: { Header, TimetableColumn, Table, DoneButton },
     mounted() {
-        this.$store.dispatch('loadDoctorsList');
+        this.$store.dispatch('loadServiceList');
     },
 };
 </script>
@@ -55,13 +57,14 @@ html {
     --table-border-color: #78787833;
 }
 body {
-    background: var(--grey-color);
+    background: var(--white-color);
     min-height: 100vh;
     margin: 0;
     padding: 0;
     font-family: var(--font-family, sans-serif);
 }
 .timetable {
+    margin-top: 15px;
     &__container {
         max-width: 1440px;
         margin: 0 auto;
@@ -76,8 +79,6 @@ body {
         position: relative;
         background: var(--white-color);
         border-radius: 25px;
-        padding: 40px;
-        padding-bottom: 41px;
     }
     &__flex {
         display: flex;

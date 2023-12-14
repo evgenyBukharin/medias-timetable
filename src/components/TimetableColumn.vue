@@ -9,7 +9,13 @@
                     :id="'item' + idx"
                     @click="toggleActivity($event, idx, item)"
                 >
-                    <img :src="item.image" width="40" height="40" alt="Иконка кабинета" v-if="!item.isDoctor" />
+                    <img
+                        :src="item.image"
+                        width="40"
+                        height="40"
+                        alt="Иконка кабинета"
+                        v-if="!item.isDoctor"
+                    />
                     <h4
                         class="timetableColumn__title"
                         :class="{
@@ -20,7 +26,12 @@
                     </h4>
                     <h5 class="timetableColumn__job">{{ item.job }}</h5>
                     <div class="timetableColumn__online" v-if="item.isOnline">
-                        <img src="../assets/img/online.svg" width="26" height="31" alt="Онлайн прием" />
+                        <img
+                            src="../assets/img/online.svg"
+                            width="26"
+                            height="31"
+                            alt="Онлайн прием"
+                        />
                     </div>
                 </div>
             </div>
@@ -35,14 +46,20 @@ export default {
     name: 'TimetableColumn',
     components: { simplebar },
     methods: {
-        toggleActivity(event, index, item) {
+        toggleActivity(event, index, doctor) {
             if (this.$store.state.activeItemIndex !== index) {
+                if (this.$store.state.activeItemIndex == null) {
+                    this.$store.commit('updateIsDoctorChanged', true);
+                }
                 if (this.$store.state.activeItemIndex !== null) {
-                    document.getElementById('item' + this.$store.state.activeItemIndex).classList.remove('timetableColumn__item-active');
+                    document
+                        .getElementById('item' + this.$store.state.activeItemIndex)
+                        .classList.remove('timetableColumn__item-active');
                 }
                 event.target.classList.add('timetableColumn__item-active');
                 this.$store.commit('changeActiveItemIndex', index);
-                this.$store.dispatch('loadTimetable', item);
+                this.$store.dispatch('loadCabinetsList', doctor);
+                // this.$store.dispatch('loadTimetable', item); item == doctor (переименовал)
             }
         },
     },

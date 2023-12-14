@@ -5,106 +5,16 @@ export default createStore({
     state: {
         citiesList: ['Красноярск'],
         currentCity: 'Красноярск',
+        currentService: '',
         currentFillialToggler: 'ДокторОст',
         currentPeriod: 14,
-        // doctorsList: [
-        //     {
-        //         id: 0,
-        //         title: 'Кузина Оксана Владимировна',
-        //         job: 'Невролог, рефлексотерапевт, цефалголог, гирудотерапевт',
-        //         isOnline: false,
-        //         isDoctor: true,
-        //     },
-        //     {
-        //         id: 1,
-        //         title: 'Максимова Татьяна Петровна',
-        //         job: 'Главный врач, невролог высшей категории',
-        //         isOnline: true,
-        //         isDoctor: true,
-        //     },
-        //     {
-        //         id: 2,
-        //         title: 'Логвинова Светлана Васильевна',
-        //         job: 'Невролог первой категории, рефлексотерапевт',
-        //         isOnline: true,
-        //         isDoctor: true,
-        //     },
-        //     {
-        //         id: 3,
-        //         title: 'Самонова Наталья Анатольевна',
-        //         job: 'Невролог первой категории, рефлексотерапевт',
-        //         isOnline: true,
-        //         isDoctor: true,
-        //     },
-        //     {
-        //         id: 4,
-        //         title: 'Самонова Наталья Анатольевна',
-        //         job: 'Невролог первой категории, рефлексотерапевт',
-        //         isOnline: true,
-        //         isDoctor: true,
-        //     },
-        //     {
-        //         id: 5,
-        //         title: 'Самонова Наталья Анатольевна',
-        //         job: 'Невролог первой категории, рефлексотерапевт',
-        //         isOnline: true,
-        //         isDoctor: true,
-        //     },
-        //     {
-        //         id: 6,
-        //         image: require('../assets/img/cabinet-icon-1.svg'),
-        //         title: '303 кабинет',
-        //         job: 'Процедурный',
-        //         isDoctor: false,
-        //     },
-        //     {
-        //         id: 7,
-        //         image: require('../assets/img/cabinet-icon-2.svg'),
-        //         title: '305 кабинет',
-        //         job: 'Массажный',
-        //         isDoctor: false,
-        //     },
-        //     {
-        //         id: 8,
-        //         image: require('../assets/img/cabinet-icon-2.svg'),
-        //         title: '305 кабинет',
-        //         job: 'Массажный',
-        //         isDoctor: false,
-        //     },
-        //     {
-        //         id: 9,
-        //         image: require('../assets/img/cabinet-icon-2.svg'),
-        //         title: '305 кабинет',
-        //         job: 'Массажный',
-        //         isDoctor: false,
-        //     },
-        //     {
-        //         id: 10,
-        //         image: require('../assets/img/cabinet-icon-2.svg'),
-        //         title: '305 кабинет',
-        //         job: 'Массажный',
-        //         isDoctor: false,
-        //     },
-        //     {
-        //         id: 11,
-        //         image: require('../assets/img/cabinet-icon-2.svg'),
-        //         title: '305 кабинет',
-        //         job: 'Массажный',
-        //         isDoctor: false,
-        //     },
-        //     {
-        //         id: 12,
-        //         image: require('../assets/img/cabinet-icon-2.svg'),
-        //         title: '305 кабинет',
-        //         job: 'Массажный',
-        //         isDoctor: false,
-        //     },
-        // ],
         activeItemIndex: null,
         currentTimetable: [],
         userSelectedCells: [],
         isTimetableLoaded: false,
         isDoctorsListLoaded: false,
+        isServiceChanged: false,
+        isDoctorChanged: false,
         doneButtonText: 'Записать на прием',
         userFormData: {
             name: '',
@@ -113,6 +23,13 @@ export default createStore({
             phone: '',
             birthday: null,
         },
+        serviceList: [],
+        currentService: {
+            name: '',
+            duration: 30,
+        },
+        currentCabinet: 'Выберите кабинет',
+        filterValue: '',
     },
     getters: {},
     mutations: {
@@ -124,6 +41,15 @@ export default createStore({
         },
         updateCurrentCity(state, value) {
             state.currentCity = value;
+        },
+        updateCurrentService(state, service) {
+            state.currentService = service;
+        },
+        updateCurrentCabinet(state, cabinet) {
+            state.currentCabinet = cabinet;
+        },
+        updateCurrentFilterValue(state, name) {
+            state.filterValue = name;
         },
         changeActiveItemIndex(state, idx) {
             state.activeItemIndex = idx;
@@ -149,15 +75,38 @@ export default createStore({
         updateIsDoctorsListLoaded(state, value) {
             state.isDoctorsListLoaded = value;
         },
+        updateIsServiceChanged(state, value) {
+            state.isServiceChanged = value;
+        },
+        updateIsDoctorChanged(state, value) {
+            state.isDoctorChanged = value;
+        },
         setNewDoctorsList(state, list) {
             state.doctorsList = list;
+        },
+        setNewServiceList(state, list) {
+            state.serviceList = list;
+        },
+        setNewCabinetsList(state, list) {
+            state.cabinetsList = list;
         },
     },
     actions: {
         loadTimetable({ state, commit }, item) {
             // get dev ver
+            // axios
+            //     .get(`http://localhost:3000/timetable`)
+            //     .then((r) => r.data)
+            //     .then((timetable) => {
+            //         commit('setNewTimetable', timetable);
+            //         commit('updateIsTimetableLoaded', true);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
+            // get prod ver medias
             axios
-                .get(`http://localhost:3000/timetable`)
+                .get(`/appointment/data/timeTable.php`)
                 .then((r) => r.data)
                 .then((timetable) => {
                     commit('setNewTimetable', timetable);
@@ -184,8 +133,19 @@ export default createStore({
         },
         loadDoctorsList({ commit }) {
             // dev ver
+            // axios
+            //     .get(`http://localhost:3000/doctorsList`)
+            //     .then((r) => r.data)
+            //     .then((list) => {
+            //         commit('setNewDoctorsList', list);
+            //         commit('updateIsDoctorsListLoaded', true);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
+            // prod ver medias
             axios
-                .get(`http://localhost:3000/doctorsList`)
+                .get(`/appointment/data/dataPacient.php`)
                 .then((r) => r.data)
                 .then((list) => {
                     commit('setNewDoctorsList', list);
@@ -205,6 +165,52 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
+        },
+        loadServiceList({ commit }) {
+            // dev ver
+            // axios
+            //     .get(`http://localhost:3000/serviceList`)
+            //     .then((r) => r.data)
+            //     .then((list) => {
+            //         commit('setNewServiceList', list);
+            //         commit('updateIsDoctorsListLoaded', true);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
+            // prod ver
+            axios
+                .get(`/appointment/data/serviceList.php`)
+                .then((r) => r.data)
+                .then((list) => {
+                    commit('setNewServiceList', list);
+                    commit('updateIsDoctorsListLoaded', true);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        loadCabinetsList({ commit }, item) {
+            // dev ver
+            // axios
+            //     .get(`http://localhost:3000/cabinetsList`)
+            //     .then((r) => r.data)
+            //     .then((list) => {
+            //         commit('setNewCabinetsList', list);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
+            // prod ver
+            axios
+                .get(`/appointment/data/dataPacient.php`)
+                .then((r) => r.data)
+                .then((list) => {
+                    commit('setNewCabinetsList', list);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         },
         sendSelectedCells({ state, commit }) {
             axios
