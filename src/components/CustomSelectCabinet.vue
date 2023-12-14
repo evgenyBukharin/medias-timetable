@@ -63,6 +63,7 @@ export default {
         },
         updateCurrentCabinet(value) {
             this.$store.commit('updateCurrentCabinet', value);
+            this.$store.dispatch('loadTimetable');
             this.isListVisible = false;
         },
     },

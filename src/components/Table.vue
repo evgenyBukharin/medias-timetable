@@ -178,6 +178,7 @@ export default {
     border: 1px solid var(--blue-color);
     border-radius: 10px;
     width: 100%;
+    margin-bottom: 0;
     &-disabled {
         & .table__row {
             opacity: 0;

@@ -82,7 +82,7 @@ export default {
         font-size: 16px;
         font-weight: 500;
         line-height: normal;
-        border-radius: 10px;
+        border-radius: 10px !important;
         border: 1px solid var(--blue-color);
         min-width: 410px;
         font-family: var(--font-family);

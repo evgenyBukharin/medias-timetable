@@ -37,6 +37,13 @@ export default {
 </script>
 
 <style lang="scss">
+#inner-headline {
+    width: 1140px;
+    margin: 0 auto;
+}
+#content .container {
+    width: 1440px;
+}
 html {
     box-sizing: border-box;
 }
