@@ -19,29 +19,35 @@
                 @click="changePeriod($event)"
             >
                 <div class="table__container-cell">
-                    <span class="table__text table__text-date">{{
-                        removeYearFromDate(item.date)
-                    }}</span>
+                    <span class="table__text table__text-date">
+                        {{ removeYearFromDate(item.date) }}
+                    </span>
                     <span class="table__text table__text-weekday">{{ item.weekDay }}</span>
                 </div>
             </div>
         </div>
         <div class="table__row" v-for="row in $store.state.currentTimetable">
-            <div class="table__cell table__cell-time">{{ row.time }}</div>
-            <div
-                class="table__cell table__cell-day"
-                :class="{
-                    'table__cell-day-bronned': isBronned.status,
-                    'table__cell-day-selected': isBronned.isSelected,
-                }"
-                v-for="(isBronned, idx) in getTimetableRows(row.days, row.time)"
-                @click="
-                    selectCell($event.target, isBronned.status, {
-                        time: row.time,
-                        day: $store.state.visiblePeriod[idx].date,
-                    })
-                "
-            ></div>
+            <div class="table__cell table__cell-time">{{ Object.keys(row)[0] }}</div>
+            <div class="table__row-container">
+                <div class="table__row-inner" v-for="quarter in row">
+                    <div
+                        v-for="(day, idx) in getTimetableRows(quarter, quarter)"
+                        class="table__cell table__cell-day table__cell-day-inner"
+                        :class="{
+                            'table__cell-day-bronned': day.isBronned,
+                            'table__cell-day-selected': day.isSelected,
+                        }"
+                        @click="
+                            selectCell($event.target, day.isBronned, {
+                                time: quarter,
+                                day: $store.state.visiblePeriod[idx].date,
+                            })
+                        "
+                    >
+                        <!-- {{ quarter }} -->
+                    </div>
+                </div>
+            </div>
         </div>
         <div
             class="table__banner"
@@ -100,16 +106,16 @@ export default {
             }
             this.$store.commit('setNewVisiblePeriod', result);
         },
-        getTimetableRows(days, time) {
+        getTimetableRows(quarterDays, time) {
             const result = [];
             result.length = this.$store.state.currentPeriod;
             for (let i = 0; i < result.length; i++) {
                 result[i] = {
-                    status: false,
+                    isBronned: false,
                     isSelected: false,
                 };
             }
-            days.forEach((day) => {
+            quarterDays.forEach((day) => {
                 this.$store.state.visiblePeriod.forEach((obj, idx) => {
                     if (this.$store.state.userSelectedCells.length > 0) {
                         this.$store.state.userSelectedCells.forEach((selectedCell) => {
@@ -119,7 +125,7 @@ export default {
                         });
                     }
                     if (obj.date == day) {
-                        result[idx].status = true;
+                        result[idx].isBronned = true;
                     }
                 });
             });
@@ -134,6 +140,7 @@ export default {
                 }
                 domEl.classList.toggle('table__cell-day-selected');
             }
+            console.log();
         },
         removeYearFromDate(item) {
             let arr = item.split('.');
@@ -212,6 +219,20 @@ export default {
                 cursor: default;
             }
         }
+        &-container {
+            width: 100%;
+            height: 45px;
+            display: flex;
+            flex-direction: column;
+            & .table__row-inner:not(:last-child) {
+                border-bottom: 1px solid var(--grey-color);
+            }
+        }
+        &-inner {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
     }
     &__cell {
         padding: 2px 2px 3px;
@@ -237,6 +258,10 @@ export default {
             justify-content: center;
             transition: background 0.3s ease;
             cursor: pointer;
+            &-inner {
+                font-size: 8px;
+                padding: 1px;
+            }
             &-bronned {
                 background: var(--blue-color);
                 cursor: not-allowed;

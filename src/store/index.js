@@ -94,19 +94,8 @@ export default createStore({
     actions: {
         loadTimetable({ state, commit }, item) {
             // get dev ver
-            axios
-                .get(`http://localhost:3000/timetable`)
-                .then((r) => r.data)
-                .then((timetable) => {
-                    commit('setNewTimetable', timetable);
-                    commit('updateIsTimetableLoaded', true);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            // get prod ver medias
             // axios
-            //     .get(`/appointment/data/timeTable.php`)
+            //     .get(`http://localhost:3000/timetable`)
             //     .then((r) => r.data)
             //     .then((timetable) => {
             //         commit('setNewTimetable', timetable);
@@ -115,6 +104,17 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
+            // get prod ver medias
+            axios
+                .get(`/appointment/data/timeTable.php`)
+                .then((r) => r.data)
+                .then((timetable) => {
+                    commit('setNewTimetable', timetable);
+                    commit('updateIsTimetableLoaded', true);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
             // post prod ver
             // axios
             //     .post('https://b24-ost.ru/telephoneWidget/webhooks/timeTable.php', {
@@ -133,19 +133,8 @@ export default createStore({
         },
         loadDoctorsList({ commit }) {
             // dev ver
-            axios
-                .get(`http://localhost:3000/doctorsList`)
-                .then((r) => r.data)
-                .then((list) => {
-                    commit('setNewDoctorsList', list);
-                    commit('updateIsDoctorsListLoaded', true);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            // prod ver medias
             // axios
-            //     .get(`/appointment/data/dataPacient.php`)
+            //     .get(`http://localhost:3000/doctorsList`)
             //     .then((r) => r.data)
             //     .then((list) => {
             //         commit('setNewDoctorsList', list);
@@ -154,6 +143,17 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
+            // prod ver medias
+            axios
+                .get(`/appointment/data/dataPacient.php`)
+                .then((r) => r.data)
+                .then((list) => {
+                    commit('setNewDoctorsList', list);
+                    commit('updateIsDoctorsListLoaded', true);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
             // prod ver
             // axios
             //     .get(`https://b24-ost.ru/telephoneWidget/webhooks/dataPacient.php`)
@@ -168,19 +168,8 @@ export default createStore({
         },
         loadServiceList({ commit }) {
             // dev ver
-            axios
-                .get(`http://localhost:3000/serviceList`)
-                .then((r) => r.data)
-                .then((list) => {
-                    commit('setNewServiceList', list);
-                    commit('updateIsDoctorsListLoaded', true);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            // prod ver
             // axios
-            //     .get(`/appointment/data/serviceList.php`)
+            //     .get(`http://localhost:3000/serviceList`)
             //     .then((r) => r.data)
             //     .then((list) => {
             //         commit('setNewServiceList', list);
@@ -189,21 +178,22 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
-        },
-        loadCabinetsList({ commit }, item) {
-            // dev ver
+            // prod ver
             axios
-                .get(`http://localhost:3000/cabinetsList`)
+                .get(`/appointment/data/serviceList.php`)
                 .then((r) => r.data)
                 .then((list) => {
-                    commit('setNewCabinetsList', list);
+                    commit('setNewServiceList', list);
+                    commit('updateIsDoctorsListLoaded', true);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
-            // prod ver
+        },
+        loadCabinetsList({ commit }, item) {
+            // dev ver
             // axios
-            //     .get(`/appointment/data/cabinetsList.php`)
+            //     .get(`http://localhost:3000/cabinetsList`)
             //     .then((r) => r.data)
             //     .then((list) => {
             //         commit('setNewCabinetsList', list);
@@ -211,6 +201,16 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
+            // prod ver
+            axios
+                .get(`/appointment/data/cabinetsList.php`)
+                .then((r) => r.data)
+                .then((list) => {
+                    commit('setNewCabinetsList', list);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         },
         sendSelectedCells({ state, commit }) {
             axios
