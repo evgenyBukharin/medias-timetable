@@ -4,11 +4,11 @@
         <div class="header__container">
             <div class="header__column">
                 <ServiceField />
-                <CustomSelectCabinet
+                <!-- <CustomSelectCabinet
                     :valuesList="$store.state.doctorsList"
                     :currentValue="$store.state.currentDoctor"
                     v-show="$store.state.isDoctorChanged"
-                />
+                /> -->
             </div>
             <PeriodToggler v-show="$store.state.isServiceChanged" />
         </div>

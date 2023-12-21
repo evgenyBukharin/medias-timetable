@@ -58,8 +58,7 @@ export default {
                 }
                 event.target.classList.add('timetableColumn__item-active');
                 this.$store.commit('changeActiveItemIndex', index);
-                this.$store.dispatch('loadCabinetsList', doctor);
-                // this.$store.dispatch('loadTimetable', item); item == doctor (переименовал)
+                this.$store.dispatch('loadTimetable', doctor);
             }
         },
     },

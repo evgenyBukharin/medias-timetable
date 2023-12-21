@@ -17,11 +17,26 @@ export default createStore({
         isDoctorChanged: false,
         doneButtonText: 'Записать на прием',
         userFormData: {
-            name: '',
-            surname: '',
-            fatherName: '',
-            phone: '',
-            birthday: null,
+            surname: {
+                value: '',
+                isValid: null,
+            },
+            name: {
+                value: '',
+                isValid: null,
+            },
+            fatherName: {
+                value: '',
+                isValid: null,
+            },
+            phone: {
+                value: '',
+                isValid: null,
+            },
+            birthday: {
+                value: null,
+                isValid: null,
+            },
         },
         serviceList: [],
         currentService: {
@@ -92,21 +107,10 @@ export default createStore({
         },
     },
     actions: {
-        loadTimetable({ state, commit }, item) {
+        loadTimetable({ commit }, doctor) {
             // get dev ver
-            // axios
-            //     .get(`http://localhost:3000/timetable`)
-            //     .then((r) => r.data)
-            //     .then((timetable) => {
-            //         commit('setNewTimetable', timetable);
-            //         commit('updateIsTimetableLoaded', true);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //     });
-            // get prod ver medias
             axios
-                .get(`/appointment/data/timeTable.php`)
+                .get(`http://localhost:3000/timetable`)
                 .then((r) => r.data)
                 .then((timetable) => {
                     commit('setNewTimetable', timetable);
@@ -115,12 +119,11 @@ export default createStore({
                 .catch((error) => {
                     console.log(error);
                 });
-            // post prod ver
+            // get prod ver medias
             // axios
-            //     .post('https://b24-ost.ru/telephoneWidget/webhooks/timeTable.php', {
-            //         clickedItem: item,
-            //         currentCity: state.currentCity,
-            //         currentFilial: state.currentFillialToggler,
+            //     .post('/appointment/data/timeTable.php', {
+            //         doctorId: doctor.id,
+            //         idServiceDoctorCabinet: doctor.idServiceDoctorCabinet,
             //     })
             //     .then((r) => r.data)
             //     .then((timetable) => {
@@ -131,21 +134,10 @@ export default createStore({
             //         console.log(error);
             //     });
         },
-        loadDoctorsList({ commit }) {
+        loadDoctorsList({ state, commit }) {
             // dev ver
-            // axios
-            //     .get(`http://localhost:3000/doctorsList`)
-            //     .then((r) => r.data)
-            //     .then((list) => {
-            //         commit('setNewDoctorsList', list);
-            //         commit('updateIsDoctorsListLoaded', true);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //     });
-            // prod ver medias
             axios
-                .get(`/appointment/data/dataPacient.php`)
+                .get(`http://localhost:3000/doctorsList`)
                 .then((r) => r.data)
                 .then((list) => {
                     commit('setNewDoctorsList', list);
@@ -154,9 +146,11 @@ export default createStore({
                 .catch((error) => {
                     console.log(error);
                 });
-            // prod ver
+            // prod ver medias
             // axios
-            //     .get(`https://b24-ost.ru/telephoneWidget/webhooks/dataPacient.php`)
+            //     .post(`/appointment/data/dataPacient.php`, {
+            //         id: state.currentService.id,
+            //     })
             //     .then((r) => r.data)
             //     .then((list) => {
             //         commit('setNewDoctorsList', list);
@@ -168,19 +162,8 @@ export default createStore({
         },
         loadServiceList({ commit }) {
             // dev ver
-            // axios
-            //     .get(`http://localhost:3000/serviceList`)
-            //     .then((r) => r.data)
-            //     .then((list) => {
-            //         commit('setNewServiceList', list);
-            //         commit('updateIsDoctorsListLoaded', true);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //     });
-            // prod ver
             axios
-                .get(`/appointment/data/serviceList.php`)
+                .get(`http://localhost:3000/serviceList`)
                 .then((r) => r.data)
                 .then((list) => {
                     commit('setNewServiceList', list);
@@ -189,34 +172,32 @@ export default createStore({
                 .catch((error) => {
                     console.log(error);
                 });
-        },
-        loadCabinetsList({ commit }, item) {
-            // dev ver
+            // prod ver
             // axios
-            //     .get(`http://localhost:3000/cabinetsList`)
+            //     .get(`/appointment/data/serviceList.php`)
             //     .then((r) => r.data)
             //     .then((list) => {
-            //         commit('setNewCabinetsList', list);
+            //         commit('setNewServiceList', list);
+            //         commit('updateIsDoctorsListLoaded', true);
             //     })
             //     .catch((error) => {
             //         console.log(error);
             //     });
-            // prod ver
-            axios
-                .get(`/appointment/data/cabinetsList.php`)
-                .then((r) => r.data)
-                .then((list) => {
-                    commit('setNewCabinetsList', list);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
         },
         sendSelectedCells({ state, commit }) {
+            // сюда в запрос еще дату и время записи, выбранные пользователем
             axios
                 .post('http://summitbuttonlink', {
-                    currentDoctor: state.doctorsList[state.activeItemIndex],
-                    userSelectedCells: state.userSelectedCells,
+                    idServiceDoctorCabinet:
+                        state.doctorsList[state.activeItemIndex].idServiceDoctorCabinet,
+                    formData: {
+                        surname: state.userFormData.surname.value,
+                        name: state.userFormData.name.value,
+                        fatherName: state.userFormData.fatherName.value,
+                        phone: state.userFormData.phone.value,
+                        birthday: state.userFormData.birthday.value,
+                    },
+                    innerUserId: localStorage.getItem('innerUserId'),
                 })
                 .then((timetable) => {
                     commit('setNewTimetable', timetable);

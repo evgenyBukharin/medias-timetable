@@ -26,22 +26,27 @@
                 </div>
             </div>
         </div>
-        <div class="table__row" v-for="row in $store.state.currentTimetable">
+        <div class="table__row" v-for="(row, rowId) in $store.state.currentTimetable">
             <div class="table__cell table__cell-time">{{ Object.keys(row)[0] }}</div>
             <div class="table__row-container">
-                <div class="table__row-inner" v-for="quarter in row">
+                <div class="table__row-inner" v-for="(quarter, id) in row">
                     <div
-                        v-for="(day, idx) in getTimetableRows(quarter, quarter)"
+                        v-for="(day, idx) in getTimetableRows(quarter, id)"
                         class="table__cell table__cell-day table__cell-day-inner"
                         :class="{
                             'table__cell-day-bronned': day.isBronned,
                             'table__cell-day-selected': day.isSelected,
                         }"
                         @click="
-                            selectCell($event.target, day.isBronned, {
-                                time: quarter,
-                                day: $store.state.visiblePeriod[idx].date,
-                            })
+                            selectCell(
+                                $event.target,
+                                day.isBronned,
+                                {
+                                    time: id,
+                                    day: $store.state.visiblePeriod[idx].date,
+                                },
+                                rowId
+                            )
                         "
                     >
                         <!-- {{ quarter }} -->
@@ -119,6 +124,8 @@ export default {
                 this.$store.state.visiblePeriod.forEach((obj, idx) => {
                     if (this.$store.state.userSelectedCells.length > 0) {
                         this.$store.state.userSelectedCells.forEach((selectedCell) => {
+                            // сравниваем все ячейки выбранные пользователем
+                            // с каждой отрисованной, что бы они отрисовывались на текущем периоде
                             if (selectedCell.time == time && selectedCell.day == obj.date) {
                                 result[idx].isSelected = true;
                             }
@@ -131,7 +138,10 @@ export default {
             });
             return result;
         },
-        selectCell(domEl, isBronned, cell) {
+        selectCell(domEl, isBronned, cell, rowId) {
+            // let quartersToReserve = this.$store.state.currentService.duration / 15;
+            // let timetableRow = this.$store.state.currentTimetable[rowId];
+            // console.log(timetableRow);
             if (!isBronned) {
                 if (domEl.classList.contains('table__cell-day-selected')) {
                     this.$store.commit('removeUserSelectedCell', cell);
@@ -140,7 +150,6 @@ export default {
                 }
                 domEl.classList.toggle('table__cell-day-selected');
             }
-            console.log();
         },
         removeYearFromDate(item) {
             let arr = item.split('.');
@@ -267,7 +276,7 @@ export default {
                 cursor: not-allowed;
             }
             &-selected {
-                background: var(--light-blue-color);
+                background: var(--black-color);
             }
         }
         &-button {

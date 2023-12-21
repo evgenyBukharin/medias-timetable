@@ -1,5 +1,9 @@
 <template>
-    <button class="button" @click="submitHandler()" :disabled="$store.state.activeItemIndex == null">
+    <button
+        class="button"
+        @click="submitHandler()"
+        :disabled="$store.state.activeItemIndex == null"
+    >
         {{ $store.state.doneButtonText }}
     </button>
 </template>
@@ -9,7 +13,18 @@ export default {
     name: 'DoneButton',
     methods: {
         submitHandler() {
-            this.$store.dispatch('sendSelectedCells');
+            if (this.checkFormValidity()) {
+                this.$store.dispatch('sendSelectedCells');
+            }
+        },
+        checkFormValidity() {
+            for (let key of Object.keys(this.$store.state.userFormData)) {
+                if (this.$store.state.userFormData[key].isValid !== true) {
+                    this.$store.state.userFormData[key].isValid = false;
+                    return false;
+                }
+            }
+            return true;
         },
     },
 };

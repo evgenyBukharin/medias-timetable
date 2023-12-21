@@ -90,6 +90,7 @@ body {
     &__flex {
         display: flex;
         gap: 15px;
+        min-height: 560px;
     }
     &__mask {
         position: absolute;
