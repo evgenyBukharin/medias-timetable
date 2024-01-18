@@ -10,12 +10,13 @@ export default createStore({
         currentPeriod: 14,
         activeItemIndex: null,
         currentTimetable: [],
-        userSelectedCells: [],
+        userSelectedCell: null,
         isTimetableLoaded: false,
         isDoctorsListLoaded: false,
-        isServiceChanged: false,
+        isServiceSelected: false,
         isDoctorChanged: false,
         doneButtonText: 'Записать на прием',
+        doctorsList: [],
         userFormData: {
             surname: {
                 value: '',
@@ -41,10 +42,169 @@ export default createStore({
         serviceList: [],
         currentService: {
             name: '',
-            duration: 30,
+            duration: 45,
         },
         currentCabinet: 'Выберите кабинет',
         filterValue: '',
+        // timetableColumnTemplate для столбца со врменем, не для отрисовки, иначе изменение
+        // этого объекта приведет к дублированию на все столбцы расписания каждого
+        timetableColumnTemplate: {
+            '9:00': {
+                isBronned: false,
+            },
+            '9:15': {
+                isBronned: false,
+            },
+            '9:30': {
+                isBronned: false,
+            },
+            '9:45': {
+                isBronned: false,
+            },
+            '10:00': {
+                isBronned: false,
+            },
+            '10:15': {
+                isBronned: false,
+            },
+            '10:30': {
+                isBronned: false,
+            },
+            '10:45': {
+                isBronned: false,
+            },
+            '11:00': {
+                isBronned: false,
+            },
+            '11:15': {
+                isBronned: false,
+            },
+            '11:30': {
+                isBronned: false,
+            },
+            '11:45': {
+                isBronned: false,
+            },
+            '12:00': {
+                isBronned: false,
+            },
+            '12:15': {
+                isBronned: false,
+            },
+            '12:30': {
+                isBronned: false,
+            },
+            '12:45': {
+                isBronned: false,
+            },
+            '13:00': {
+                isBronned: false,
+            },
+            '13:15': {
+                isBronned: false,
+            },
+            '13:30': {
+                isBronned: false,
+            },
+            '13:45': {
+                isBronned: false,
+            },
+            '14:00': {
+                isBronned: false,
+            },
+            '14:15': {
+                isBronned: false,
+            },
+            '14:30': {
+                isBronned: false,
+            },
+            '14:45': {
+                isBronned: false,
+            },
+            '15:00': {
+                isBronned: false,
+            },
+            '15:15': {
+                isBronned: false,
+            },
+            '15:30': {
+                isBronned: false,
+            },
+            '15:45': {
+                isBronned: false,
+            },
+            '16:00': {
+                isBronned: false,
+            },
+            '16:15': {
+                isBronned: false,
+            },
+            '16:30': {
+                isBronned: false,
+            },
+            '16:45': {
+                isBronned: false,
+            },
+            '17:00': {
+                isBronned: false,
+            },
+            '17:15': {
+                isBronned: false,
+            },
+            '17:30': {
+                isBronned: false,
+            },
+            '17:45': {
+                isBronned: false,
+            },
+            '18:00': {
+                isBronned: false,
+            },
+            '18:15': {
+                isBronned: false,
+            },
+            '18:30': {
+                isBronned: false,
+            },
+            '18:45': {
+                isBronned: false,
+            },
+            '19:00': {
+                isBronned: false,
+            },
+            '19:15': {
+                isBronned: false,
+            },
+            '19:30': {
+                isBronned: false,
+            },
+            '19:45': {
+                isBronned: false,
+            },
+            '20:00': {
+                isBronned: false,
+            },
+            '20:15': {
+                isBronned: false,
+            },
+            '20:30': {
+                isBronned: false,
+            },
+            '20:45': {
+                isBronned: false,
+            },
+        },
+        isThereAnySelectedCells: false,
+        selectedCellsData: {
+            date: null,
+            time: null,
+        },
+        isDoneButtonBlocked: false,
+        allowedMonthsIds: [0, 1, 2],
+        isAdmin: false,
+        isResultVisible: false,
+        resultTitle: '',
+        showResultCellsData: true,
     },
     getters: {},
     mutations: {
@@ -69,15 +229,6 @@ export default createStore({
         changeActiveItemIndex(state, idx) {
             state.activeItemIndex = idx;
         },
-        addUserSelectedCell(state, cell) {
-            state.userSelectedCells.push(cell);
-        },
-        removeUserSelectedCell(state, clickedCell) {
-            let index = state.userSelectedCells.findIndex((cell) => {
-                return cell.time == clickedCell.time && cell.day == clickedCell.day;
-            });
-            state.userSelectedCells.splice(index, 1);
-        },
         setNewVisiblePeriod(state, array) {
             state.visiblePeriod = array;
         },
@@ -90,8 +241,8 @@ export default createStore({
         updateIsDoctorsListLoaded(state, value) {
             state.isDoctorsListLoaded = value;
         },
-        updateIsServiceChanged(state, value) {
-            state.isServiceChanged = value;
+        updateIsServiceSelected(state, value) {
+            state.isServiceSelected = value;
         },
         updateIsDoctorChanged(state, value) {
             state.isDoctorChanged = value;
@@ -105,26 +256,43 @@ export default createStore({
         setNewCabinetsList(state, list) {
             state.cabinetsList = list;
         },
+        clearServiceField(state) {
+            state.filterValue = '';
+            state.isTimetableLoaded = false;
+        },
+        clearActiveDoctorDOM(state) {
+            document
+                .getElementById('item' + state.activeItemIndex)
+                .classList.remove('timetableColumn__item-active');
+        },
+        setIsThereAnySelectedCells(state, value) {
+            state.isThereAnySelectedCells = value;
+        },
+        setNewSelectedCellsData(state, data) {
+            state.selectedCellsData.date = data.date;
+            state.selectedCellsData.time = data.time;
+        },
+        setAllowedMonthsIds(state, array) {
+            state.allowedMonthsIds = array;
+        },
+        updateIsAdmin(state, value) {
+            state.isAdmin = value;
+        },
+        updateIsResultVisible(state, value) {
+            state.isResultVisible = value;
+        },
+        updateResultTitle(state, value) {
+            state.resultTitle = value;
+        },
+        updateShowResultCellsData(state, value) {
+            state.showResultCellsData = value;
+        },
     },
     actions: {
         loadTimetable({ commit }, doctor) {
-            // get dev ver
-            axios
-                .get(`http://localhost:3000/timetable`)
-                .then((r) => r.data)
-                .then((timetable) => {
-                    commit('setNewTimetable', timetable);
-                    commit('updateIsTimetableLoaded', true);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            // get prod ver medias
+            // dev ver
             // axios
-            //     .post('/appointment/data/timeTable.php', {
-            //         doctorId: doctor.id,
-            //         idServiceDoctorCabinet: doctor.idServiceDoctorCabinet,
-            //     })
+            //     .get(`http://localhost:3000/newTimetable`)
             //     .then((r) => r.data)
             //     .then((timetable) => {
             //         commit('setNewTimetable', timetable);
@@ -133,24 +301,25 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
-        },
-        loadDoctorsList({ state, commit }) {
-            // dev ver
+            // prod ver
             axios
-                .get(`http://localhost:3000/doctorsList`)
+                .post('/appointment/data/timeTable.php', {
+                    doctorId: doctor.id,
+                    idServiceDoctorCabinet: doctor.idServiceDoctorCabinet,
+                })
                 .then((r) => r.data)
-                .then((list) => {
-                    commit('setNewDoctorsList', list);
-                    commit('updateIsDoctorsListLoaded', true);
+                .then((timetable) => {
+                    commit('setNewTimetable', timetable);
+                    commit('updateIsTimetableLoaded', true);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
-            // prod ver medias
+        },
+        loadDoctorsList({ state, commit }) {
+            // dev ver
             // axios
-            //     .post(`/appointment/data/dataPacient.php`, {
-            //         id: state.currentService.id,
-            //     })
+            //     .get(`http://localhost:3000/doctorsList`)
             //     .then((r) => r.data)
             //     .then((list) => {
             //         commit('setNewDoctorsList', list);
@@ -159,22 +328,24 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
-        },
-        loadServiceList({ commit }) {
-            // dev ver
+            // prod ver
             axios
-                .get(`http://localhost:3000/serviceList`)
+                .post(`/appointment/data/dataPacient.php`, {
+                    id: state.currentService.id,
+                })
                 .then((r) => r.data)
                 .then((list) => {
-                    commit('setNewServiceList', list);
+                    commit('setNewDoctorsList', list);
                     commit('updateIsDoctorsListLoaded', true);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
-            // prod ver
+        },
+        loadServiceList({ commit }) {
+            // dev ver
             // axios
-            //     .get(`/appointment/data/serviceList.php`)
+            //     .get(`http://localhost:3000/serviceList`)
             //     .then((r) => r.data)
             //     .then((list) => {
             //         commit('setNewServiceList', list);
@@ -183,31 +354,88 @@ export default createStore({
             //     .catch((error) => {
             //         console.log(error);
             //     });
-        },
-        sendSelectedCells({ state, commit }) {
-            // сюда в запрос еще дату и время записи, выбранные пользователем
+            // prod ver
             axios
-                .post('http://summitbuttonlink', {
-                    idServiceDoctorCabinet:
-                        state.doctorsList[state.activeItemIndex].idServiceDoctorCabinet,
-                    formData: {
-                        surname: state.userFormData.surname.value,
-                        name: state.userFormData.name.value,
-                        fatherName: state.userFormData.fatherName.value,
-                        phone: state.userFormData.phone.value,
-                        birthday: state.userFormData.birthday.value,
-                    },
-                    innerUserId: localStorage.getItem('innerUserId'),
-                })
-                .then((timetable) => {
-                    commit('setNewTimetable', timetable);
-                    commit('updateIsTimetableLoaded', true);
-                    state.doneButtonText = 'Успешно';
+                .get(`/appointment/data/serviceList.php`)
+                .then((r) => r.data)
+                .then((list) => {
+                    commit('setNewServiceList', list);
+                    commit('updateIsDoctorsListLoaded', true);
                 })
                 .catch((error) => {
                     console.log(error);
-                    state.doneButtonText = 'Не удалось записать';
                 });
+        },
+        loadAllowedMonthsIds({ commit }) {
+            // dev ver
+            // axios
+            //     .get(`http://localhost:3000/allowedMonthsIds`)
+            //     .then((r) => r.data)
+            //     .then((array) => {
+            //         commit('setAllowedMonthsIds', array);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
+            // prod ver
+            axios
+                .get(`/appointment/data/allowedMonthsIds.php`)
+                .then((r) => r.data)
+                .then((array) => {
+                    commit('setAllowedMonthsIds', array);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        sendSelectedCells({ state, commit }) {
+            // prod ver
+            if (
+                state.selectedCellsData.date !== null &&
+                state.selectedCellsData.time !== null &&
+                state.isThereAnySelectedCells == true
+            ) {
+                state.isDoneButtonBlocked = true;
+                axios
+                    .post('/appointment/handlers/makeAnAppointment.php', {
+                        idServiceDoctorCabinet:
+                            state.doctorsList[state.activeItemIndex].idServiceDoctorCabinet,
+                        formData: {
+                            surname: state.userFormData.surname.value,
+                            name: state.userFormData.name.value,
+                            fatherName: state.userFormData.fatherName.value,
+                            phone: state.userFormData.phone.value,
+                            birthday: state.userFormData.birthday.value,
+                        },
+                        innerUserId: localStorage.getItem('innerUserId'),
+                        appointment_date: state.selectedCellsData.date,
+                        appointment_time: state.selectedCellsData.time,
+                    })
+                    .then((timetable) => {
+                        commit('setNewTimetable', timetable);
+                        commit('updateIsTimetableLoaded', true);
+                        commit('updateIsResultVisible', true);
+                        state.isDoneButtonBlocked = true;
+                        state.resultTitle = 'Вы успешно записались на прием';
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        commit('updateIsResultVisible', true);
+                        state.isDoneButtonBlocked = false;
+                        state.resultTitle = 'Не удалось записаться на прием';
+                    });
+            } else {
+                state.doneButtonText = 'Время и дата не выбраны';
+            }
+        },
+        clearActiveDoctor({ commit }) {
+            commit('clearActiveDoctorDOM');
+            commit('changeActiveItemIndex', null);
+        },
+        clearUserSelectedCells() {
+            document.querySelectorAll('.table__cell-day-selected-user').forEach((cell) => {
+                cell.classList.remove('table__cell-day-selected-user');
+            });
         },
     },
     modules: {},

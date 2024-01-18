@@ -28,6 +28,7 @@
                 </li>
             </ul>
         </simplebar>
+        <button class="field__button" @click="clearField()">Очистить</button>
     </div>
 </template>
 <script>
@@ -46,13 +47,23 @@ export default {
             this.isListVisible = !this.isListVisible;
         },
         updateCurrentService(service) {
+            if (this.$store.state.isTimetableLoaded == true) {
+                this.$store.commit('updateIsTimetableLoaded', false);
+            }
+            if (!this.$store.state.isServiceSelected) {
+                this.$store.commit('updateIsServiceSelected', true);
+            }
+            if (this.$store.state.isThereAnySelectedCells == true) {
+                this.removeSelectedCells();
+            }
+            if (this.$store.state.activeItemIndex !== null) {
+                this.$store.dispatch('clearActiveDoctor');
+            }
+
             this.$store.commit('updateCurrentService', service);
             this.$store.commit('updateCurrentFilterValue', service.name);
             this.$store.dispatch('loadDoctorsList');
 
-            if (!this.$store.state.isServiceChanged) {
-                this.$store.commit('updateIsServiceChanged', true);
-            }
             this.toggleList();
         },
         filterServiceList() {
@@ -67,6 +78,26 @@ export default {
             return filteredValues.length !== 0
                 ? filteredValues
                 : [{ name: 'Совпадений нет', disabled: true }];
+        },
+        clearField() {
+            this.$store.commit('clearServiceField');
+            if (this.$store.state.activeItemIndex !== null) {
+                this.$store.dispatch('clearActiveDoctor');
+            }
+            if (this.$store.state.isServiceSelected == true) {
+                this.$store.commit('updateIsServiceSelected', false);
+            }
+            if (this.$store.state.isThereAnySelectedCells == true) {
+                this.removeSelectedCells();
+            }
+        },
+        removeSelectedCells() {
+            this.$store.commit('setIsThereAnySelectedCells', false);
+            this.$store.commit('setNewSelectedCellsData', {
+                date: null,
+                time: null,
+            });
+            this.$store.dispatch('clearUserSelectedCells');
         },
     },
 };
@@ -144,6 +175,18 @@ export default {
                 }
             }
         }
+    }
+    &__button {
+        margin-left: 12px;
+        border: none;
+        background: var(--blue-color);
+        color: var(--white-color);
+        padding: 7px 14px;
+        border-radius: 10px;
+        font-family: var(--font-family);
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
     }
 }
 </style>

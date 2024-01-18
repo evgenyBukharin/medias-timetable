@@ -10,7 +10,7 @@
                     v-show="$store.state.isDoctorChanged"
                 /> -->
             </div>
-            <PeriodToggler v-show="$store.state.isServiceChanged" />
+            <PeriodToggler v-show="$store.state.isServiceSelected" />
         </div>
     </div>
 </template>

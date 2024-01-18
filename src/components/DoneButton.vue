@@ -1,6 +1,9 @@
 <template>
     <button
         class="button"
+        :class="{
+            'button-fullydisabled': $store.state.isDoneButtonBlocked,
+        }"
         @click="submitHandler()"
         :disabled="$store.state.activeItemIndex == null"
     >
@@ -46,6 +49,11 @@ export default {
     &:disabled {
         cursor: not-allowed;
         opacity: 0.7;
+    }
+    &-fullydisabled {
+        background: #1e1e1e;
+        opacity: 0.5;
+        pointer-events: none;
     }
 }
 </style>
